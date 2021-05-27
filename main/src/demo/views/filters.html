@@ -1,0 +1,15 @@
+<h3>Data Presentation & Filters</h3>
+
+<p>The ultraslim library supports filters for data presentation in this way: 
+</p>
+<pre><code>
+</code></pre>
+
+<p>List of data elements: </p>
+<ul>
+  <li ae-repeat="persons" ae-click="this.controller.handle({{id}})" id="data_{{id}}">
+    {{id}} {{lastname}},{{firstname}} {{birthday|renderDate}}</li>
+</ul>
+
+<p>Reload: </p>
+<button ae-click="this.controller.personsService.load()" >reload</button>

@@ -1,0 +1,22 @@
+<h3>Directives &amp; events</h3>
+
+<p>The ultraslim library supports directives for templating, rendering model 
+  data and for binding event handlers, e.g., in this way: 
+</p>
+<pre><code>&lt;li ae-repeat="data" ae-click="this.controller.handle({{id}})" id="data_{{id}}"&gt;{{name}}&lt;/li&gt;
+</code></pre>
+
+<ul>
+  <li ae-repeat="data" ae-click="this.controller.handleClick({{id}})" id="data_{{id}}">{{name}}</li>
+</ul>
+
+<ul>
+  <li ae-repeat="data" id="data_{{id}}">{{name}} ({{address.street}})</li>
+</ul>
+
+
+
+<p>The ultraslim library support these events: </p>
+<ul>
+  <li><code>ae-click</code></li>
+</ul>

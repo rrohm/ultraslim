@@ -1,0 +1,23 @@
+<h3>Data, Loading &amp; Binding</h3>
+
+<p>The ultraslim library supports directives for templating, rendering model 
+  data and for binding event handlers, e.g., in this way: 
+</p>
+<pre><code>
+</code></pre>
+
+<p>List of data elements: </p>
+<ul>
+  <li ae-repeat="persons" ae-click="this.controller.handle({{id}})" id="data_{{id}}">
+    {{id}} {{lastname}},{{firstname}} {{address.street}} {{foo}}</li>
+</ul>
+
+<p>Reload: </p>
+<button ae-click="this.controller.personsService.load()" >reload</button>
+
+<p>Add: </p>
+<button ae-click="this.controller.personAdd()" >add</button>
+
+<p>Replace: </p>
+<button ae-click="this.controller.personReplace()" >replace</button>
+

@@ -1,0 +1,6 @@
+[
+  {"id":100, "birthday": 1487342300000, "lastname": "Mustermann", "firstname": "M.", "address":{"street": "ThisStreet", "nr": 23}},
+  {"id":101, "birthday": null, "lastname": "Müller", "firstname": "L.", "address":{"street": "ThatStreet", "nr": 14}},
+  {"id":102, "lastname": "Käfer", "firstname": "K.", "address":{"street": "AStreet", "nr": 1}},
+  {"id":103, "lastname": "Lyse", "firstname": "A.", "list": [5,6,7,8,0]}
+]

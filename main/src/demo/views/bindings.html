@@ -1,0 +1,37 @@
+<h3>Two-Way-Bindings for controls</h3>
+
+<p>The ultraslim library supports two-way data binding for for HTML input 
+  controls via <code>ae-bind</code> attribute („directive“):
+</p>
+
+<pre><code>
+  &lt;input id="input1" name="input1" type="text" ae-bind="this.controller.model.name" /&gt;
+</code></pre>
+
+<form>
+  <fieldset>
+    <legend>Controls with simple data binding</legend>
+    <label for="input0">
+      Input 1
+      <input id="input0" name="input0" type="text" ae-bind="this" />
+    </label>
+    <br/>
+    <label for="input1">
+      Input 1: Name
+      <input id="input1" name="input1" type="text" ae-bind="this.controller.model.name" />
+    </label>
+    <br/>
+    <label for="input2">
+      Input 2: First name
+      <input id="input2" name="input2" type="text" ae-bind="this.controller.model.firstname" />
+    </label>
+  </fieldset>
+  
+  <fieldset>
+    <legend>Controls with data binding to nested properties</legend>
+    <label for="input3">
+      Input 3
+      <input id="input3" name="input0" type="text" ae-bind="this.controller.model.person.name" />
+    </label>
+  </fieldset>
+</form>

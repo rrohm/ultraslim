@@ -1,0 +1,12 @@
+{
+  "elements": {},
+  "attributes": {
+    "æ-repeat": {},
+    "æ-click": {
+      "context": "li"
+    },
+    "ae-bind": {},
+    "ae-click": {},
+    "ae-repeat": {}
+  }
+}
