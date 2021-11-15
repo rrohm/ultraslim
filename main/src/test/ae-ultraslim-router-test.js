@@ -78,7 +78,6 @@ describe('ae-ultraslim-router', function () {
 
 
   describe('navigate (routeURL)', function () {
-    var urlEmpty = '';
     var urlRoot = '/';
     var urlSimple = 'first';
     var urlParams1 = 'second/:id';

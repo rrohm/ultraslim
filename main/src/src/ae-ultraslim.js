@@ -26,6 +26,10 @@
 
 (function (Æ) {
   'use strict';
+  /**
+   * @namespace æ
+   * @type Æ|Window.æ|window.æ|window.ultraslim
+   */
   var æ = window.æ || new Æ();
   window.æ = window.ultraslim = æ;
 
@@ -40,7 +44,6 @@
 
   /**
    * The internal view cache.
-   * @type Object Internal view cache
    */
   var views = {};
   var me = this;
@@ -119,6 +122,8 @@
 
   /**
    * Create a REST service API object for the given model property. 
+   * @function service
+   * @memberOf æ
    * @param {Object} o The model object
    * @param {String} prop The property of the model to create a service for
    * @param {Object} config The configuration object
@@ -460,9 +465,9 @@
   /**
    * Inner class for view instances - they wrap a DOM element and provide 
    * methods for loading new content into the element.
-   * 
+   * @constructs View
    * @param {type} name
-   * @returns {ae-ultraslim_L31.View}
+   * @returns {ae-ultraslim.View}
    */
   var View = function (name) {
     /**
@@ -703,8 +708,11 @@
     var me = this;
     console.log('View.prototype.createHandler', me, node.id, event, code);
 
-    return function () {
+    return function (e) {
       console.log('me: ', me, node, event);
+      if (event === 'click') {
+        e.preventDefault();
+      }
       var f = new Function(code);
       f.call(me);
     };
@@ -790,7 +798,7 @@
    * @param {String} template
    * @param {Object} model
    * @param {Object} controller Optional controller object
-   * @returns {String|DOM NodeList}
+   * @returns {String|DOMNodeList}
    */
   View.prototype.render = function (template, model, controller) {
     console.log('View.prototype.render', model, controller);
@@ -882,9 +890,10 @@
   /**
    * Register a DOM element as a view container, and create a View wrapper for 
    * it.
-   * 
+   * @function view
+   * @memberOf æ
    * @param {type} name
-   * @returns {ae-ultraslim_L31.view}
+   * @returns {ae-ultraslim.View}
    */
   this.view = function (name) {
     if (!views[name]) {
@@ -896,8 +905,8 @@
 
   /**
    * Constructor for a ae-ultraslim router.
-   * @param {type} config Configuration object.
-   * @returns {ae-ultraslimL#32.Router}
+   * @constructs Router
+   * @param {Object} config Configuration object.
    */
   var Router = function (config) {
     var me = this;
@@ -919,6 +928,7 @@
    * Register a default route handler that should be used for all routes that 
    * cannot get resolved. 
    * 
+   * @memberOf Router
    * @param {function} handler
    * @returns {undefined}
    */
@@ -932,6 +942,8 @@
 
   /**
    * Initial wiring of the router, scanning of the page.
+   * 
+   * @memberOf router
    * @returns {undefined}
    */
   Router.prototype.init = function () {
@@ -947,6 +959,8 @@
 
   /**
    * Register a route URL with a handler function. 
+   * 
+   * @memberOf router
    * @param {Sting} routeURL
    * @param {Function} handler
    * @returns {undefined}
@@ -1061,10 +1075,12 @@
   };
 
   /**
-   * Create a new ultraslim.router. 
+   * Create a new ultraslim.Router. 
+   * @function router
+   * @memberOf æ
    * @param {String} root The root URL, currently not used,
    * @param {Boolean} useHash Whether to use hashed URLs or not, currently not used.
-   * @returns {ae-ultraslim_L32.Router}
+   * @returns {Router}
    */
   this.router = function (root, useHash) {
     return new Router({

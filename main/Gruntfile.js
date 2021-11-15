@@ -41,13 +41,10 @@ module.exports = function (grunt) {
       dist: ['src/dist/**']
     },
     jshint: {
-      all: ['Gruntfile.js', 'src/src/**/*.js', 'src/test/**/*.js'],
+      all: ['Gruntfile.js', 'src/src/**/*.js', 'src/test/*test.js'],
       options: {
         jshintrc: true
       }
-//      ,
-//      beforeconcat: [],
-//      afterconcat: []
     },
     uglify: {
       options: {
@@ -57,7 +54,6 @@ module.exports = function (grunt) {
           dead_code: true,
           join_vars: true,
           loops: true,
-          warnings: true,
           passes: 10,
           pure_funcs: ['console.log'],
           unused: true
@@ -73,23 +69,25 @@ module.exports = function (grunt) {
     },
     // Client Testing: 
     jasmine: {
-      src: "src/src/**/*.js",
+      src: "src/src/*.js",
       options: {
         keepRunner: true, // keep Test-Runner, e.g. for manual testing
-        specs: 'src/test/**/*test.js',
-        vendor: 'node_modules/sinon/pkg/sinon-1.17.3.js',
+        specs: 'src/test/*test.js',
+        vendor: 'node_modules/sinon/pkg/sinon.js',
         helpers: [
           'node_modules/jasmine-ajax/lib/mock-ajax.js'
         ],
         display: 'full',
         showLog: false,
-        showLogging: false
+        showLogging: false,
+        summary: true,
+        version: '3.8.0'
       }
     },
     // Watch project files for changes:  
     watch: {
       all: {
-        files: ['src/test/**/*.js', 'src/src/**/*.js', 'Gruntfile.js'],
+        files: ['src/test/*.js', 'src/src/*.js', 'Gruntfile.js'],
         tasks: ['jshint', 'jasmine']
       }
     }

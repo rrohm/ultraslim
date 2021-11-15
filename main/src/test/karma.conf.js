@@ -28,21 +28,39 @@
  * @param {object} config
  * @returns {undefined}
  */
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = function (config) {
   config.set({
     files: [
-      '../public_html/js/app/**/*.js',
-      '**/*Test.js'
+//      'src/src/*.js',
+      '*test.js'
     ],
     basePath: '.',
     plugins: [
       'karma-jasmine',
-      'karma-coverage' 
+      'karma-coverage',
+      'karma-firefox-launcher',
+      'karma-chrome-launcher'
     ],
     frameworks: ['jasmine'],
-//    preprocessors: ['coverage'],
-    reporters: ['progress'],
+    preprocessors: ['coverage'],
+    reporters: ['progress', 'coverage'],
     captureTimeout: 5000,
-    singleRun: false
+    singleRun: true,
+//    customLaunchers: {
+//      ChromeHeadless: {
+//        base: 'Chrome',
+//        flags: [
+//          '--headless',
+//          '--disable-gpu',
+//          '--no-sandbox',
+//          '--remote-debugging-port=9222',
+//        ]
+//      }
+//    },
+//    browsers: ['ChromeHeadless'],
+    browsers: ['Firefox'],
+    restartOnFileChange: true
   });
 };

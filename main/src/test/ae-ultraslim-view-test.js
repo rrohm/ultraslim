@@ -36,7 +36,8 @@ describe('ae-ultraslim æ.view content viewer', function () {
     var request, fragmentURL;
     var onSuccess, onFailure, onDone;
     var el, router, view;
-    var controller = {init: function () {
+    var controller = {
+      init: function () {
         console.log('controller.init CALLED');
       }};
 
