@@ -65,6 +65,9 @@ describe('ae-ultraslim æ.view content viewer', function () {
     });
 
     it('invokes the controller.init(element) method, if present', function () {
+      controller.init = function () {
+        console.log('controller.init CALLED');
+      };
       spyOn(controller, 'init').and.callThrough();
 
       æ.templates.cache = {}; // reset cache

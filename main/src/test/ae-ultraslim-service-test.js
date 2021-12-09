@@ -77,6 +77,20 @@ describe('ae-ultraslim æ.service', function () {
     expect(service.onBeforeSend).toEqual(handler);
   });
   
+  it('accepts a config.dataProp property', function () {
+    var handler = function(){};
+    var propertyName = 'this-is-the-data';
+    var service = æ.service(model, 'address', {
+      url: 'bla',
+      dataProp: propertyName,
+      onBeforeSend: handler 
+    });
+    
+    expect(service).toBeDefined();
+    expect(service.dataProp).toBeDefined();
+    expect(service.dataProp).toEqual(propertyName);
+  });
+  
   it('rejects a global config.onBeforeSend handler if it is not a function', function () {
     expect(function(){
       æ.service(model, 'address', {
@@ -114,6 +128,33 @@ describe('ae-ultraslim æ.service', function () {
     });
     afterEach(function () {
       jasmine.Ajax.uninstall();
+    });
+    it('loads model property', function () {
+      var service = æ.service(model, 'persons', {
+        url:'test/data/persons.json'
+      });
+      service.load();
+      
+      request = jasmine.Ajax.requests.mostRecent();
+      request.respondWith({status: 200, responseText: '[{"id":1000,"name":"Maurer"},{"id":1001,"name":"Mueller"}]'});
+      
+      expect(model.persons.length).toEqual(2);
+      expect(model.persons[1].id).toBeDefined();
+      expect(model.persons[1].id).toEqual(1001);
+    });
+    it('loads model from data property', function () {
+      var service = æ.service(model, 'persons', {
+        url:'test/data/persons.json',
+        dataProp: 'data'
+      });
+      service.load();
+      
+      request = jasmine.Ajax.requests.mostRecent();
+      request.respondWith({status: 200, responseText: '{"some":"thing","data":[{"id":1000,"name":"Maurer"},{"id":1001,"name":"Mueller"}]}'});
+      
+      expect(model.persons.length).toEqual(2);
+      expect(model.persons[1].id).toBeDefined();
+      expect(model.persons[1].id).toEqual(1001);
     });
     it('calls global onBeforeSend-, onSuccess- and onDone-handlers', function () {
       var service = æ.service(model, 'persons', {

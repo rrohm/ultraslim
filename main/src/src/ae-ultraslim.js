@@ -154,6 +154,7 @@
     var service = {};
     var url = (typeof config === 'string') ? config : config.url;
     service = {};
+    service.dataProp = (config.dataProp !== undefined) ? config.dataProp : undefined;
     service.onError = (typeof config.onError === 'function') ? config.onError : undefined;
     service.onBeforeSend = (typeof config.onBeforeSend === 'function') ? config.onBeforeSend : undefined;
     service.onSuccess = (typeof config.onSuccess === 'function') ? config.onSuccess : undefined;
@@ -179,7 +180,7 @@
         console.log("æ.data.http.get onload", o, e, xhr);
         if (xhr.status < 400) {
           var data = JSON.parse(xhr.responseText);
-          o[prop] = data;
+          o[prop] = (service.dataProp !== undefined) ? data[service.dataProp]: data;
         }
 
         defaultLoadHandling(config, xhr);
@@ -852,7 +853,7 @@
           prop = prop.substr(0, prop.indexOf('|'));
           filter = placeholder.substr(placeholder.indexOf('|') +1,  placeholder.length - 3 - placeholder.indexOf('|'));
         }
-        console.log('REPLACE > ' + prop.indexOf('|'), placeholder, prop, filter);
+        console.log('REPLACE >', placeholder, prop, filter);
         
         var t = '';
         if (model.hasOwnProperty(prop)) {
@@ -863,13 +864,9 @@
           s = s.replace(placeholder, t);
           console.log('REPLACE a', t);
         } else if (prop.indexOf('.') > -1) {
-//          t = new Function('try { return this.' + prop +'; } catch (ex) { return "{{' + prop +'}}";} ').call(model);
           t = new Function('try { return this.' + prop +'; } catch (ex) { return "{{' + prop +'}}";} ').call(model);
           s = s.replace(placeholder, t);
           console.log('REPLACE b', t);
-//        } else {
-//          s = s.replace(placeholder, '???');
-          
         }
       }
     }
