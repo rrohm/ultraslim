@@ -200,4 +200,42 @@ describe('ae-ultraslim æ.view content viewer', function () {
   describe('View.process(element, model, controller)', function () {
     
   });
+  
+  describe('View.replace(template, model) filtering', function () {
+    var view;
+    var controller = {
+      init: function () {
+        console.log('controller.init CALLED');
+      },
+      filterTest: function(input){
+        return '###' + input + '###';
+      }
+    };
+    beforeEach(function () {
+      view = æ.view('foo');
+      view.controller = controller;
+    });
+    
+    it('applies filter function', function () {
+      var t = 'ID {{id}} is {{name|filterTest}} ';
+      var result = 'ID 123 is ###TEST### ';
+      var model = {
+        id: 123,
+        name: 'TEST'
+      };
+
+      expect(view.replace(t, model)).toEqual(result);
+    });
+    
+    it('applies filter function also on single instances with trailing other placeholders', function () {
+      var t = '{{name|filterTest}} is ID {{id}} ';
+      var result = '###TEST### is ID 123 ';
+      var model = {
+        id: 123,
+        name: 'TEST'
+      };
+
+      expect(view.replace(t, model)).toEqual(result);
+    });
+  });
 });

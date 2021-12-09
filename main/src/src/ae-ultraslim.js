@@ -847,12 +847,12 @@
       for (var i = 0; i < placeholders.length; i++) {
         var placeholder = placeholders[i];
         var prop = placeholder.substr(2, placeholder.length - 4);
-        var filter;
+        var filter = undefined;
         if (prop.indexOf('|') > -1) {
           prop = prop.substr(0, prop.indexOf('|'));
           filter = placeholder.substr(placeholder.indexOf('|') +1,  placeholder.length - 3 - placeholder.indexOf('|'));
         }
-        console.log('REPLACE >', placeholder, prop, filter);
+        console.log('REPLACE > ' + prop.indexOf('|'), placeholder, prop, filter);
         
         var t = '';
         if (model.hasOwnProperty(prop)) {
