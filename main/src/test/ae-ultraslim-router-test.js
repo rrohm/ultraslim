@@ -22,7 +22,8 @@
  * THE SOFTWARE.
  */
 
-/* global expect, jasmine */
+/* global expect, jasmine, await */
+/* esversion 9 */
 
 describe('ae-ultraslim-router Test Suite', function () {
   it('runs specs.', function () {
@@ -106,56 +107,54 @@ describe('ae-ultraslim-router', function () {
     it('falls back to a default route.', function () {
       router.onError(handler4);
       router.default(handler5);
-      router.navigate('foo');
+      const result = await router.navigate('foo');
       expect(handler5).toHaveBeenCalled();
       expect(handler4).not.toHaveBeenCalled();
     });
     it('maps an emtpy route to the "/" slash route.', function () {
       router.on(urlRoot, handler1);
-      router.navigate('');
+      const result = await router.navigate('');
       expect(handler1).toHaveBeenCalled();
     });
 
     it('falls back to the "404" route if the route cannot be matched and error handler is provided.', function () {
       router.onError(handler4);
-      router.navigate('foo');
+      const result = await router.navigate('foo');
       expect(handler4).toHaveBeenCalled();
     });
 
     it('looks up simple URLs and calls handler', function () {
-      router.navigate(urlSimple);
+      const result = await router.navigate(urlSimple);
       expect(handler1).toHaveBeenCalled();
     });
 
     it('looks up parameterized URLs and calls handler', function () {
-      router.navigate(urlParams1);
+      const result = await router.navigate(urlParams1);
       expect(handler2).toHaveBeenCalled();
     });
 
     it('looks up parameterized URLs with param values and calls handler', function () {
-      router.navigate('second/2');
+      const result = await router.navigate('second/2');
       expect(handler2).toHaveBeenCalled();
     });
 
     it('passes parameters to the handler', function () {
-      router.navigate('second/2');
+      const result = await router.navigate('second/2');
       expect(handler2).toHaveBeenCalled();
       expect(handler2).toHaveBeenCalledWith({params: {id: '2'}});
     });
 
     it('passes more than one parameters to the handler', function () {
-      router.navigate('third/2/foo');
+      const result = await router.navigate('third/2/foo');
       expect(handler3).toHaveBeenCalled();
       expect(handler3).toHaveBeenCalledWith({params: {id: '2', name: 'foo'}});
     });
 
     it('handles URLs starting with a /', function () {
-      router.navigate('/third/2/foo');
+      const result = await router.navigate('/third/2/foo');
       expect(handler3).toHaveBeenCalled();
       expect(handler3).toHaveBeenCalledWith({params: {id: '2', name: 'foo'}});
     });
 
   });
-
-
 });
