@@ -33,6 +33,10 @@ THE SOFTWARE.
   color: #333;
 }
 
+body {
+  padding: 1em 5em 0 1em;
+}
+
 pre, pre code  {
   font-family: monospace;
   background-color: #fafafa;
@@ -54,11 +58,15 @@ p {
 }
 
 nav {
-  width: 120px;
+  width: 150px;
   float: left;
 }
 
+ul {
+  margin-left: 1em;
+}
+
 #view {
-  margin-left: 120px; 
+  margin-left: 150px; 
 }
 

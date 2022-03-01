@@ -2,6 +2,7 @@
   "elements": {},
   "attributes": {
     "æ-repeat": {},
+    "ae-model": {},
     "æ-click": {
       "context": "li"
     },

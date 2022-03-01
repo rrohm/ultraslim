@@ -554,6 +554,7 @@
     } else {
       console.log('View.prototype.onLoad 2', typeof t);
       this.getEl().innerHTML = t;
+      this.process(this.getEl(), model, controller);
     }
     if (controller && typeof controller.init === 'function') {
       controller.init(this.getEl());
@@ -588,6 +589,7 @@
      */
     var doProcess = function (node) {
       // process element nodes: 
+      console.log("View.prototype.doProcess", node);
       if (node.nodeType === 1) {
         var parent = node.parentNode;
         for (var m = 0; m < node.attributes.length; m++) {
@@ -669,6 +671,11 @@
             }
 
             view.createListener(fqPropName, node);
+            
+          } else if (attr.name === attrPrefix + 'model') {
+            console.log(attrPrefix + 'model', attr.value);
+            node.textContent = new Function("return " + attr.value).call(view);
+            view.createTextBinding(attr.value, node);
           }
         }
       }
@@ -768,6 +775,43 @@
       }
     }
   };
+  
+  View.prototype.createTextBinding = function (fqPropName, textnode) {
+    var view = this;
+    console.log('View.prototype.createTextBinding', fqPropName, textnode);
+    if (fqPropName.lastIndexOf('.') > 0) {
+      var oName = fqPropName.substr(0, fqPropName.lastIndexOf('.'));
+      var propName = fqPropName.substr(fqPropName.lastIndexOf('.') + 1);
+      console.log('names: ', 'Object=' + oName, 'Prop=' + propName);
+
+      var o = new Function("return " + oName).call(view);
+      console.log('Object', o);
+
+      if (o && o.addChangeListener && o.addChangeListener instanceof Function) {
+        o.addChangeListener(propName, function (sender, oldValue, newValue) {
+          console.log('View.prototype.createTextBinding.onChange ', sender, oldValue, newValue);
+          textnode.textContent = newValue;
+        });
+      }
+
+      // do we need a listener on the parent object? yes, if parent is not controller
+      if (oName.lastIndexOf('.') > 0 && oName !== 'this.controller' && oName !== 'this.controller.model') {
+        var parentName = oName.substr(0, oName.lastIndexOf('.'));
+        var parent = new Function('return ' + parentName).call(view);
+
+        if (parent && parent.addChangeListener && parent.addChangeListener instanceof Function) {
+          var parentPropName = oName.substr(oName.lastIndexOf('.') + 1);
+          parent.addChangeListener(parentPropName, function (sender, oldValue, newValue) {
+            if (newValue) {
+              textnode.textContent = newValue[propName];
+            } else {
+              textnode.textContent = '';
+            }
+          });
+        }
+      }
+    }
+  };
 
 
   View.prototype.filter = function(type, t){
@@ -792,7 +836,7 @@
 
   /**
    * Render model data into the template: 
-   * - if there is no model: just return the template
+   * - if there is no model: process the template with an emtpy dummy,
    * - if there is a model but there are no directivess: just set the model
    * - else (model and directives): process template, i.e. apply bindings etc.
    * 
@@ -811,9 +855,12 @@
     
     if (template.indexOf(attrPrefix) > -1) {
       console.log('View.prototype.render 3');
+      if (template.indexOf(expPrefix) > -1) {
+        console.log('View.prototype.render 3.1');
+        template = this.replace(template, model);
+      }
       var el = document.createElement('DIV');
       el.innerHTML = template;
-
       this.process(el, model, controller);
       return el.childNodes;
     }
@@ -823,25 +870,26 @@
       console.log('View.prototype.render 2');
       if (template.indexOf(expPrefix) > -1) {
         console.log('View.prototype.render 2.1');
-        template = this.replace(template, model);
+        template = this.replace(template, model, false);
       }
       return template;
     } 
   };
 
   /**
-   * Simple string templating for object data, replaces all {{...}}
+   * String templating for object data, replaces all {{...}}
    * placeholders with the values of corresponding properties of the model 
    * object.
    * @param {String} template
    * @param {Object} model
+   * @param {boolean} doCreateResponsiveElement
    * @returns {String} The template string with replaced placeholders.
    */
-  View.prototype.replace = function (template, model) {
+  View.prototype.replace = function (template, model, doCreateResponsiveElement) {
     if (template.trim() === '') {
       return template;
     }
-    console.log('REPLACE', template, model);
+    console.log('REPLACE', template, model, doCreateResponsiveElement);
     var s = template;
     var placeholders = template.match(/(\{{.+?\}})/g);
     if (placeholders && placeholders.length > 0) {
@@ -861,7 +909,7 @@
           if (filter) {
             t = this.filter(filter, t);
           }
-          s = s.replace(placeholder, t);
+          s = s.replace(placeholder, (doCreateResponsiveElement === true) ? '<span ae-model="'+prop+'">'+t+'</span>' : t);
           console.log('REPLACE a', t);
         } else if (prop.indexOf('.') > -1) {
           t = new Function('try { return this.' + prop +'; } catch (ex) { return "{{' + prop +'}}";} ').call(model);
