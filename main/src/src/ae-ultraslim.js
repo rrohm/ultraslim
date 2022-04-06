@@ -682,10 +682,13 @@
       // process text nodes: 
       if (node.nodeType === 3) {
         if (node.nodeValue.indexOf(expPrefix) > -1) {
-          node.nodeValue = view.replace(node.nodeValue, model);
-          if (node.nodeValue.indexOf('<b>') > -1) {
-//            alert(0);
-            node.innerHTML = node.nodeValue;
+          var t = view.replace(node.nodeValue, model);
+          if (t.indexOf('<p>') > -1 || t.indexOf('<i>') > -1 || t.indexOf('<strong>') > -1 || t.indexOf('<br>') > -1 || t.indexOf('<div>') > -1 || t.indexOf('<h1>') > -1 || t.indexOf('<h2>') > -1 || t.indexOf('<h3>') > -1 || t.indexOf('<h4>') > -1 || t.indexOf('<h5>') > -1 || t.indexOf('<h6>') > -1) {
+            var e = document.createElement("span");
+            e.innerHTML = t;
+            node.replaceWith(e);
+          } else {
+            node.nodeValue = t;
           }
         }
       }
