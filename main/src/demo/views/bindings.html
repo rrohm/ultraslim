@@ -17,11 +17,6 @@
 <form>
   <fieldset>
     <legend>Controls with simple data binding</legend>
-    <label for="input0">
-      Input 1
-      <input id="input0" name="input0" type="text" ae-bind="this" />
-    </label>
-    <br/>
     <label for="input1">
       Input 1: Name
       <input id="input1" name="input1" type="text" ae-bind="this.controller.model.name" />
@@ -30,6 +25,11 @@
     <label for="input2">
       Input 2: First name
       <input id="input2" name="input2" type="text" ae-bind="this.controller.model.firstname" />
+    </label>
+    <br/>
+    <label for="input2">
+      Input 3: Likes Cats?
+      <input id="input3" name="input3" type="checkbox" ae-bind="this.controller.model.likeCats" />
     </label>
   </fieldset>
   

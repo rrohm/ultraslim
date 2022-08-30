@@ -1,7 +1,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2017 Robert Rohm r.rohm@aeonium-systems.de.
+ * Copyright 2022 Robert Rohm r.rohm@aeonium-systems.de.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -152,8 +152,8 @@
       this.object(o);
     }
     var service = {};
-    var url = (typeof config === 'string') ? config : config.url;
     service = {};
+    service.url = (typeof config === 'string') ? config : config.url;
     service.dataProp = (config.dataProp !== undefined) ? config.dataProp : undefined;
     service.onError = (typeof config.onError === 'function') ? config.onError : undefined;
     service.onBeforeSend = (typeof config.onBeforeSend === 'function') ? config.onBeforeSend : undefined;
@@ -173,54 +173,54 @@
      * @returns {undefined}
      */
     service.load = function (config) {
-      console.log("æ.data.http.get", o, url);
+      console.log("æ.data.http.get", o, this.url);
       var xhr = new XMLHttpRequest();
 
       xhr.addEventListener('load', function (e) {
         console.log("æ.data.http.get onload", o, e, xhr);
         if (xhr.status < 400) {
           var data = JSON.parse(xhr.responseText);
-          o[prop] = (service.dataProp !== undefined) ? data[service.dataProp]: data;
+          o[prop] = (service.dataProp !== undefined) ? data[service.dataProp] : data;
         }
 
         defaultLoadHandling(config, xhr);
       });
-      xhr.open('GET', url);
+      xhr.open('GET', this.url);
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       defaultOnBeforeSendHandling(config, xhr);
       xhr.send();
     };
     service.delete = function (id, config) {
-      console.log("æ.data.http.delete", o, url);
+      console.log("æ.data.http.delete", o, this.url);
       var xhr = new XMLHttpRequest();
       xhr.addEventListener('load', function () {
         defaultLoadHandling(config, xhr);
       });
-      xhr.open('DELETE', url + '/' + id);
+      xhr.open('DELETE', this.url + '/' + id);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       defaultOnBeforeSendHandling(config, xhr);
       xhr.send();
     };
     service.create = function (data, config) {
-      console.log("æ.data.http.post", o, url);
+      console.log("æ.data.http.post", o, this.url);
       var xhr = new XMLHttpRequest();
       xhr.addEventListener('load', function () {
         defaultLoadHandling(config, xhr);
       });
-      xhr.open('POST', url);
+      xhr.open('POST', this.url);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       defaultOnBeforeSendHandling(config, xhr);
       xhr.send(JSON.stringify(data));
     };
     service.save = function (data, config) {
-      console.log("æ.data.http.put", o, url);
+      console.log("æ.data.http.put", o, this.url);
       var xhr = new XMLHttpRequest();
       xhr.addEventListener('load', function () {
         defaultLoadHandling(config, xhr);
       });
-      xhr.open('PUT', url);
+      xhr.open('PUT', this.url);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       defaultOnBeforeSendHandling(config, xhr);
@@ -276,7 +276,7 @@
     var me = this;
     var data = [];
     var listeners = {};
-    
+
     console.log("æ.object() ", o);
     if (!o) {
       return;
@@ -307,7 +307,7 @@
           console.log('set.object');
           me.object(value);
         }
-        
+
         var oldValue = data[prop];
         data[prop] = value;
         if (listeners[prop]) {
@@ -656,7 +656,11 @@
 //            node.attributes.removeNamedItem(attrPrefix + 'bind');
             var propValue = new Function("return " + fqPropName).call(view);
             console.log(attrPrefix + 'bind', propValue);
-            node.value = propValue;
+            if (node.type === 'checkbox') {
+              node.checked = (propValue === true);
+            } else {
+              node.value = propValue;
+            }
 
             if (fqPropName.lastIndexOf('.') > 0) {
               var name = fqPropName.substr(0, fqPropName.lastIndexOf('.'));
@@ -665,13 +669,17 @@
               /*jshint loopfunc: true */
               node.onchange = function (event) {
                 console.log('onchange on bound control: ', node, event);
-                propOwner[fqPropName.substr(fqPropName.lastIndexOf('.') + 1)] = node.value;
+                if (node.type === 'checkbox') {
+                  propOwner[fqPropName.substr(fqPropName.lastIndexOf('.') + 1)] = (node.checked === true);
+                } else {
+                  propOwner[fqPropName.substr(fqPropName.lastIndexOf('.') + 1)] = node.value;
+                }
                 console.log('onchange on bound control: ', propOwner);
               };
             }
 
             view.createListener(fqPropName, node);
-            
+
           } else if (attr.name === attrPrefix + 'model') {
             console.log(attrPrefix + 'model', attr.value);
             node.textContent = new Function("return " + attr.value).call(view);
@@ -778,7 +786,7 @@
       }
     }
   };
-  
+
   View.prototype.createTextBinding = function (fqPropName, textnode) {
     var view = this;
     console.log('View.prototype.createTextBinding', fqPropName, textnode);
@@ -817,7 +825,7 @@
   };
 
 
-  View.prototype.filter = function(type, t){
+  View.prototype.filter = function (type, t) {
     console.log("FILTER", type, t);
     switch (type) {
       case "Date":
@@ -827,7 +835,7 @@
         var date = new Date();
         date.setTime(t);
         return date.toLocaleDateString('de-DE');
-        
+
       default:
         if (this.controller.hasOwnProperty(type) && this.controller[type] instanceof Function) {
           return this.controller[type](t);
@@ -855,7 +863,7 @@
       console.log('View.prototype.render 1');
       return this.replace(template, {});
     }
-    
+
     if (template.indexOf(attrPrefix) > -1) {
       console.log('View.prototype.render 3');
       if (template.indexOf(expPrefix) > -1) {
@@ -876,7 +884,7 @@
         template = this.replace(template, model, false);
       }
       return template;
-    } 
+    }
   };
 
   /**
@@ -893,6 +901,7 @@
       return template;
     }
     console.log('REPLACE', template, model, doCreateResponsiveElement);
+//    console.log('REPLACE', model, doCreateResponsiveElement);
     var s = template;
     var placeholders = template.match(/(\{{.+?\}})/g);
     if (placeholders && placeholders.length > 0) {
@@ -902,22 +911,26 @@
         var filter = undefined;
         if (prop.indexOf('|') > -1) {
           prop = prop.substr(0, prop.indexOf('|'));
-          filter = placeholder.substr(placeholder.indexOf('|') +1,  placeholder.length - 3 - placeholder.indexOf('|'));
+          filter = placeholder.substr(placeholder.indexOf('|') + 1, placeholder.length - 3 - placeholder.indexOf('|'));
         }
         console.log('REPLACE >', placeholder, prop, filter);
-        
+
         var t = '';
         if (model.hasOwnProperty(prop)) {
           t = (model[prop]) ? model[prop] : '';
           if (filter) {
             t = this.filter(filter, t);
           }
-          s = s.replace(placeholder, (doCreateResponsiveElement === true) ? '<span ae-model="'+prop+'">'+t+'</span>' : t);
+          s = s.replace(placeholder, (doCreateResponsiveElement === true) ? '<span ae-model="' + prop + '">' + t + '</span>' : t);
           console.log('REPLACE a', t);
         } else if (prop.indexOf('.') > -1) {
-          t = new Function('try { return this.' + prop +'; } catch (ex) { return "{{' + prop +'}}";} ').call(model);
+          t = new Function('try { return this.' + prop + '; } catch (ex) { return "{{' + prop + '}}";} ').call(model);
           s = s.replace(placeholder, t);
           console.log('REPLACE b', t);
+        } else {
+          // At present, placeholders that could not be resolved cannot be deleted.
+//          s = s.replace(placeholder, '*'+ t + '*');
+          console.log('REPLACE c', placeholder, prop, model);
         }
       }
     }

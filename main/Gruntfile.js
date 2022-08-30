@@ -1,7 +1,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2017 Robert Rohm r.rohm@aeonium-systems.de.
+ * Copyright 2022 Robert Rohm r.rohm@aeonium-systems.de.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -93,5 +93,6 @@ module.exports = function (grunt) {
     }
   });
   grunt.registerTask('default', ['jshint', 'jasmine', 'clean', 'uglify']);
+  grunt.registerTask('build', ['jshint', 'jasmine', 'clean', 'uglify']);
   grunt.registerTask('test', ['jasmine']);
 };
