@@ -42,7 +42,7 @@ THE SOFTWARE.
             message: 'This is a message from the model'
           }
         };
-        v.show('views/fragment1.html', controller);
+        v.show('views/templates.html', controller);
       });
 
       // DIRECTIVES: 
@@ -104,19 +104,24 @@ THE SOFTWARE.
           personReplace: function () {
             this.model.persons[1] = {id: 105, lastname: 'Ahnung', firstname: 'Kai', address: 'At Home'};
           },
-          handle: function(id) {
+          handle: function (id) {
             alert('Selected ID# ' + id);
           }
         };
         v.show('views/data.html', controller);
       });
 
-      
+
       router.on('/events', function () {
         var eventsController = {
-          
+          onClick: function () {
+            alert('Click!');
+          },
+          onDblClick: function () {
+            alert('Double-click!');
+          }
         };
-        
+
         v.show('views/events.html', eventsController);
       });
       router.on('/filters', function () {
@@ -148,7 +153,7 @@ THE SOFTWARE.
               return '<b>???</b>';
             }
           },
-          handle: function(id) {
+          handle: function (id) {
             alert('Selected ID# ' + id);
           }
         };
@@ -179,9 +184,9 @@ THE SOFTWARE.
         };
         v.show('views/error_handlers.html', controller);
       });
-      
+
       router.on('/routing', function () {
-    
+
         v.show('views/routing.html');
       });
     </script>

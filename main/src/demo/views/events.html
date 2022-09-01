@@ -1,14 +1,26 @@
 <h2>Events</h2>
 
-<h3>onclick</h3>
-<p>onclick events are supported on</p>
+<h3><code>ondblclick</code></h3>
+<p><code>ondblclick</code> event handling supports:</p>
+
+<ul>
+  <li><div><span ae-dblclick="alert('Oh!')">JS code in HTML elements, e.g.,</span>:</div>
+    <pre><code>&lt;span ae-dblclick="alert('Oh!')"&gt;...&lt;/span&gt;</code></pre>
+  </li>
+  <li><div><span ae-dblclick="this.controller.onDblClick">References to controller methods </span>, e.g.:</div>
+    <pre><code>&lt;span ae-dblclick="this.controller.onDblClick"&gt;...&lt;/span&gt;</code></pre>
+  </li>
+</ul>
+
+<h3><code>onclick</code></h3>
+<p><code>onclick</code> event handling supports:</p>
 
 <ul>
   <li><div>JS code on HTML elements, e.g., <span ae-click="alert('Oh!')">spans</span>:</div>
-    <pre><code>&lt;span ae-click="alert('Oh!')"&gt;spans&lt;/span&gt;</code></pre>
+    <pre><code>&lt;span ae-click="alert('Oh!')"&gt;...&lt;/span&gt;</code></pre>
   </li>
-  <li><div>single <span ae-click="alert('Oh!')">spans</span>, e.g.:</div>
-    <pre><code>&lt;span ae-click="this.controller.onClick"&gt;spans&lt;/span&gt;</code></pre>
+  <li><div><span ae-click="this.controller.onClick">References to controller methods </span>, e.g.:</div>
+    <pre><code>&lt;span ae-click="this.controller.onClick"&gt;...&lt;/span&gt;</code></pre>
   </li>
-  
 </ul>
+  

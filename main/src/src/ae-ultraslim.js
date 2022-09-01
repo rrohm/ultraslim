@@ -439,6 +439,9 @@
           if (!oldValue) {
             return;
           }
+          if (oldValue === newValue) {
+            return;
+          }
 
           if (oldValue.getChangeListeners) {
             if (!newValue.addChangeListener) {
@@ -646,9 +649,11 @@
 
           } else if (attr.name === attrPrefix + 'click') {
             console.log(attrPrefix + 'click', attr.value);
-//            node.attributes.removeNamedItem(attrPrefix + 'click');
-
             node.onclick = view.createHandler(node, 'click', attr.value);
+
+          } else if (attr.name === attrPrefix + 'dblclick') {
+            console.log(attrPrefix + 'dblclick', attr.value);
+            node.ondblclick = view.createHandler(node, 'dblclick', attr.value);
 
           } else if (attr.name === attrPrefix + 'bind') {
             console.log(attrPrefix + 'bind', attr.value);
@@ -717,7 +722,9 @@
   };
 
   /**
-   * Closure factory for event handlers.
+   * Factory for event handlers, creates a closure for JS event handling code, 
+   * or, if code is a controller method name, returns the reference to the 
+   * controller method directly.
    * @param {DOMNode} node The DOM node
    * @param {string} event The event name
    * @param {string} code The code to execute
@@ -726,15 +733,19 @@
   View.prototype.createHandler = function (node, event, code) {
     var me = this;
     console.log('View.prototype.createHandler', me, node.id, event, code);
-
-    return function (e) {
-      console.log('me: ', me, node, event);
-      if (event === 'click') {
-        e.preventDefault();
-      }
-      var f = new Function(code);
-      f.call(me);
-    };
+    var regex = new RegExp('[(].*[)]');
+    if (code.toLowerCase().startsWith('this.controller.') && !regex.test(code)) {
+      return eval(code);
+    } else {
+      return function (e) {
+        console.log('me: ', me, node, event);
+        if (event === 'click' || event === 'dblclick') {
+          e.preventDefault();
+        }
+        var f = new Function(code);
+        f.call(me);
+      };
+    }
   };
 
   /**
