@@ -214,13 +214,14 @@
       defaultOnBeforeSendHandling(config, xhr);
       xhr.send(JSON.stringify(data));
     };
-    service.save = function (data, config) {
-      console.log("æ.data.http.put", o, this.url);
+    service.save = function (data, config, id) {
+      console.log("æ.data.http.put", o, this.url, id);
+      var resId = (id) ? id : ((data.id) ? data.id : undefined);
       var xhr = new XMLHttpRequest();
       xhr.addEventListener('load', function () {
         defaultLoadHandling(config, xhr);
       });
-      xhr.open('PUT', this.url);
+      xhr.open('PUT', this.url + '/' + resId);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       defaultOnBeforeSendHandling(config, xhr);
@@ -735,7 +736,11 @@
     console.log('View.prototype.createHandler', me, node.id, event, code);
     var regex = new RegExp('[(].*[)]');
     if (code.toLowerCase().startsWith('this.controller.') && !regex.test(code)) {
-      return eval(code);
+      return (e) => {
+        e.preventDefault();
+        var f = eval(code);
+        f.call(me.controller, e);
+      };
     } else {
       return function (e) {
         console.log('me: ', me, node, event);
