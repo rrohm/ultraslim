@@ -71,7 +71,20 @@ THE SOFTWARE.
           person: {
             name: "Lyse",
             firstname: "Anna",
+            likeCats: true
           }
+        },
+        onButtonClick: function (e) {
+          console.log(e);
+          console.log(this.model);
+        },
+        onSetButtonClick: function () {
+          this.model.likeCats = !this.model.likeCats;
+          this.model.person.likeCats = !this.model.likeCats;
+        },
+        onSetButtonNewPersonClick: function () {
+          this.model.person = {name: 'Ernst', firstname: 'Max', likeCats: true};
+
         }
       };
       router.on('/bindings', function () {

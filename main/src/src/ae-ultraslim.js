@@ -214,14 +214,13 @@
       defaultOnBeforeSendHandling(config, xhr);
       xhr.send(JSON.stringify(data));
     };
-    service.save = function (data, config, id) {
-      console.log("æ.data.http.put", o, this.url, id);
-      var resId = (id) ? id : ((data.id) ? data.id : undefined);
+    service.save = function (data, config) {
+      console.log("æ.data.http.put", o, this.url);
       var xhr = new XMLHttpRequest();
       xhr.addEventListener('load', function () {
         defaultLoadHandling(config, xhr);
       });
-      xhr.open('PUT', this.url + '/' + resId);
+      xhr.open('PUT', this.url);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       defaultOnBeforeSendHandling(config, xhr);
@@ -437,6 +436,7 @@
         /*jshint loopfunc: true */
 //        console.log('æ.object(): add obj-mover listeners:', prop2, o);
         o.addChangeListener(prop2, function (theObj, oldValue, newValue) {
+          console.log("changeListener", theObj, oldValue, newValue);
           if (!oldValue) {
             return;
           }
@@ -660,10 +660,10 @@
             console.log(attrPrefix + 'bind', attr.value);
             var fqPropName = attr.value;
 //            node.attributes.removeNamedItem(attrPrefix + 'bind');
-            var propValue = new Function("return " + fqPropName).call(view);
+            var propValue = new Function("console.log(" + fqPropName+"); return " + fqPropName).call(view);
             console.log(attrPrefix + 'bind', propValue);
             if (node.type === 'checkbox') {
-              node.checked = (propValue === true);
+              node.checked = propValue;
             } else {
               node.value = propValue;
             }
@@ -738,6 +738,7 @@
     if (code.toLowerCase().startsWith('this.controller.') && !regex.test(code)) {
       return (e) => {
         e.preventDefault();
+        e.stopPropagation();
         var f = eval(code);
         f.call(me.controller, e);
       };
@@ -746,6 +747,7 @@
         console.log('me: ', me, node, event);
         if (event === 'click' || event === 'dblclick') {
           e.preventDefault();
+          e.stopPropagation();
         }
         var f = new Function(code);
         f.call(me);
@@ -776,8 +778,12 @@
 
       if (o && o.addChangeListener && o.addChangeListener instanceof Function) {
         o.addChangeListener(propName, function (sender, oldValue, newValue) {
-          console.log('View.prototype.createListener.onChange ', sender, oldValue, newValue);
-          control.value = newValue;
+          console.log('View.prototype.createListener.onChange ', sender, oldValue, newValue, control.type);
+          if (control.type === 'checkbox') {
+            control.checked = (newValue);
+          } else {
+            control.value = newValue;
+          }
         });
       }
 
@@ -790,12 +796,20 @@
           var parentPropName = oName.substr(oName.lastIndexOf('.') + 1);
           parent.addChangeListener(parentPropName, function (sender, oldValue, newValue) {
             if (newValue) {
-              control.value = newValue[propName];
+              if (control.type === 'checkbox') {
+                control.checked = newValue[propName];
+              } else {
+                control.value = newValue[propName];
+              }
             } else {
               control.value = null;
             }
             control.onchange = function () {
-              newValue[propName] = control.value;
+              if (control.type === 'checkbox') {
+                newValue[propName] = control.checked;
+              } else {
+                newValue[propName] = control.value;
+              }
             };
           });
         }
@@ -1165,5 +1179,4 @@
       useHash: useHash
     });
   };
-
 }));

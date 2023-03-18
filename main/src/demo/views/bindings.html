@@ -31,13 +31,33 @@
       Input 3: Likes Cats?
       <input id="input3" name="input3" type="checkbox" ae-bind="this.controller.model.likeCats" />
     </label>
+    <br/>
+    <label for="button1">
+        Show in console: 
+        <input id="button1" type="button" ae-click="this.controller.onButtonClick" value="Show data on console"/>
+    </label>
+    <br/>
+    <label for="button2">
+        set Value: 
+        <input id="button2" type="button" ae-click="this.controller.onSetButtonClick" value="Set Value"/>
+    </label>
   </fieldset>
   
   <fieldset>
     <legend>Controls with data binding to nested properties</legend>
-    <label for="input3">
+    <label for="input4">
       Input 3
-      <input id="input3" name="input0" type="text" ae-bind="this.controller.model.person.name" />
+      <input id="input4" name="input4" type="text" ae-bind="this.controller.model.person.name" />
+    </label>
+    <br/>
+    <label for="input5">
+      Input 4: Likes Cats?
+      <input id="input5" name="input5" type="checkbox" ae-bind="this.controller.model.person.likeCats" />
+    </label>
+    <br/>
+    <label for="buttonNewPerson">
+        set new Person 
+        <input id="buttonNewPerson" type="button" ae-click="this.controller.onSetButtonNewPersonClick" value="Set Value"/>
     </label>
   </fieldset>
 </form>
