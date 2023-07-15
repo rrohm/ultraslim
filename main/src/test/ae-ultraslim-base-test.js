@@ -101,10 +101,11 @@ describe('ae-ultraslim æ.templates.load() template loader', function () {
     expect(æ.templates.cache[fragmentURL]).toBeDefined();
   });
 
-  xit('passes through optional controllers.', function () {
+  it('passes through optional controllers.', function () {
     // it actually works, but the matcher needs fixing
     expect(æ.templates.load).toBeDefined();
     fragmentURL = 'fragment1.html';
+    const text = "<div>FRAGMENT 1</div>";
     var controller = {};
     var config = {url: fragmentURL, controller: controller};
 
@@ -116,11 +117,11 @@ describe('ae-ultraslim æ.templates.load() template loader', function () {
     æ.templates.load(config);
 
     request = jasmine.Ajax.requests.mostRecent();
-    request.respondWith({status: 200, responseText: "<div>FRAGMENT 1</div>"});
+    request.respondWith({status: 200, responseText: text});
 
     expect(onSuccess).toHaveBeenCalled();
     expect(onDone).toHaveBeenCalled();
-    expect(onDone).toHaveBeenCalledWith(config);
+    expect(onDone).toHaveBeenCalledWith(text, config);
     
     expect(æ.templates.cache).toBeDefined();
     expect(æ.templates.cache[fragmentURL]).toBeDefined();
