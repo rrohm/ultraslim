@@ -37,19 +37,19 @@ THE SOFTWARE.
         v.show('views/fragment0.html');
       });
       router.on('/first', function () {
-        let controller = {
+        let firstController = {
           model: {
             message: 'This is a message from the model'
           }
         };
-        v.show('views/templates.html', controller);
+        v.show('views/templates.html', firstController);
       });
 
       // DIRECTIVES: 
       // Supply a controller object that holds the data model in a property
       // named 'model'.
       router.on('/directives', function () {
-        var controller = {
+        var directivesController = {
           model: {
             data: [{id: 123, name: 'John Doe', "address": {"street": "ThisStreet", "nr": 23}}, {id: 234, name: 'Lisa Müller'}, {id: 345, name: 'Max Mustermann'}]
           },
@@ -57,7 +57,7 @@ THE SOFTWARE.
             alert('clicked: ' + id);
           }
         };
-        v.show('views/directives.html', controller);
+        v.show('views/directives.html', directivesController);
       });
 
       // BINDING FOR CONTROLS: 
@@ -92,8 +92,11 @@ THE SOFTWARE.
       });
 
       router.on('/data', function () {
-        var controller = {
-          model: {persons: []},
+        var dataController = {
+          model: {
+            persons: [],
+            selectedId: undefined
+          },
           init: function () {
             console.log('/data model.init()');
             this.personsService = æ.service(this.model, 'persons', {
@@ -115,13 +118,15 @@ THE SOFTWARE.
             this.model.persons.push({id: 104, lastname: 'Wurst', firstname: 'Hans', address: 'At Home'});
           },
           personReplace: function () {
+            alert('Replace');
             this.model.persons[1] = {id: 105, lastname: 'Ahnung', firstname: 'Kai', address: 'At Home'};
           },
           handle: function (id) {
-            alert('Selected ID# ' + id);
+            this.model.selectedId = id;
+            alert('Selected ID# ' + this.model.selectedId);
           }
         };
-        v.show('views/data.html', controller);
+        v.show('views/data.html', dataController);
       });
 
 
@@ -138,7 +143,7 @@ THE SOFTWARE.
         v.show('views/events.html', eventsController);
       });
       router.on('/filters', function () {
-        var controller = {
+        var filtersController = {
           model: {persons: []},
           init: function () {
             console.log('/data model.init()');
@@ -170,11 +175,11 @@ THE SOFTWARE.
             alert('Selected ID# ' + id);
           }
         };
-        v.show('views/filters.html', controller);
+        v.show('views/filters.html', filtersController);
       });
 
       router.on('/errors', function () {
-        var controller = {
+        var errorsController = {
           model: {persons: []},
           init: function () {
             console.log('/data model.init()');
@@ -195,7 +200,7 @@ THE SOFTWARE.
             this.personsService.load();
           }
         };
-        v.show('views/error_handlers.html', controller);
+        v.show('views/error_handlers.html', errorsController);
       });
 
       router.on('/routing', function () {
