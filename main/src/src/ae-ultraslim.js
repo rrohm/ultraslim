@@ -1,7 +1,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2022 Robert Rohm r.rohm@aeonium-systems.de.
+ * Copyright 2023 Robert Rohm r.rohm@aeonium-systems.de.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,20 @@
 
 (function (Æ) {
   'use strict';
+  console.log('ae-ultraslim start', window.æ);
   /**
+   * The æ namespace provides the three basic methods æ.router(), æ.view() and æ.service() of the ae-ultraslim 
+   * framework. 
+   * 
    * @namespace æ
    * @type Æ|Window.æ|window.æ|window.ultraslim
+   * @tutorial getting_started
    */
   var æ = window.æ || new Æ();
   window.æ = window.ultraslim = æ;
 
 }(function () {
+  console.log('ae-ultraslim initialization');
   /**
    * The template loader. 
    */
@@ -288,15 +294,21 @@
       };
     }
     function makeSetter(data, prop) {
+      console.log('makeSetter', data, prop);
       return function (value) {
-        console.log('set', prop, value);
+        console.log('set', this, prop, value);
+        if (Array.isArray(prop)) {
+          console.log('set', 'array prop');
+        }
+        if (Array.isArray(this)) {
+          console.log('set', 'array this');
+        }
         if (Array.isArray(value)) {
           me.object(value);
           console.log('set.array');
           value.push = function (e) {
             console.log("PUSH (SETTER)", value, e);
             Array.prototype.push.call(value, e);
-//            me.object(e);
             if (listeners[prop]) {
               for (var i in listeners[prop]) {
                 listeners[prop][i](o, null, value);
@@ -313,6 +325,13 @@
         if (listeners[prop]) {
           for (var i in listeners[prop]) {
             listeners[prop][i](o, oldValue, value);
+          }
+        }
+        
+        if (Array.isArray(this)) {
+          console.log('set ', 'array this', this);
+          for (var i in listeners) {
+            console.log('listeners', i, listeners[i]);
           }
         }
       };
@@ -369,13 +388,15 @@
     }
     /**
      * Registers a listener function for the property with the given name with 
-     * the parameters (object, oldValue, newValue).
+     * the parameters (object, oldValue, newValue). Listeners get fired by the poperty setter methods or by 
+     * o.fireChangeListeners(). 
      * 
      * @param {String} prop The property name
      * @param {Function} f The listener function, should have parameters (object, oldValue, newValue);
      * @returns {undefined}
      */
     o.addChangeListener = function (prop, f) {
+      console.log("o.addChangeListener", prop, f);
       if (!listeners[prop]) {
         listeners[prop] = [];
       }
@@ -410,7 +431,7 @@
 
 
     /**
-     * A convenience method, e.g., for notifying observers of the current value.
+     * A convenience method for firing <i>all</i> change listeners, e.g., for notifying observers of the current value.
      * @returns {undefined}
      */
     o.fireChangeListeners = function () {
@@ -472,7 +493,7 @@
    * methods for loading new content into the element.
    * @constructs View
    * @param {type} name
-   * @returns {ae-ultraslim.View}
+   * @returns {ae-ultraslim.View} A new ae-ultraslim view instance.
    */
   var View = function (name) {
     /**
@@ -605,6 +626,7 @@
         for (var j = 0; j < node.attributes.length; j++) {
           attr = node.attributes.item(j);
 
+          // ae-repeat
           if (attr.name === attrPrefix + 'repeat') {
             // model has data? render ...
             if (model[attr.value]) {
@@ -648,14 +670,51 @@
             // remove original "template" node
             node.parentNode.removeChild(node);
 
+            // ae-click
           } else if (attr.name === attrPrefix + 'click') {
             console.log(attrPrefix + 'click', attr.value);
             node.onclick = view.createHandler(node, 'click', attr.value);
 
+            // ae-dblclick
           } else if (attr.name === attrPrefix + 'dblclick') {
             console.log(attrPrefix + 'dblclick', attr.value);
             node.ondblclick = view.createHandler(node, 'dblclick', attr.value);
 
+            // ae-enabled
+          } else if (attr.name === attrPrefix + 'enabled') {
+            
+            // 1.: Simple: direct binding to model property: 
+            if (model[attr.value]) {
+              var data = model[attr.value];
+              
+            } else {
+              console.log("ae-enabled", node, attr.value);
+              var d;
+              if (typeof attr.value === "function") {
+                console.log("ae-enabled", "function");
+                d = !(attr.value)();
+              } else if (typeof attr.value === "string") {
+                console.log("ae-enabled", "string");
+                if (attr.value.indexOf('model') === 0) {
+                  var propNames = attr.value.split('.');
+                  model.addChangeListener(propNames[1], function (sender, oldValue, newData) {
+                    console.log("ae-enabled", 'model.onChange', node, sender, oldValue, newData);
+                    node.disabled = (model[propNames[1]] === undefined);
+                    console.log("ae-enabled", "model changed", node.disabled);
+                  });
+                  d = (model[propNames[1]] === undefined);
+                }
+              } else {
+                console.log("ae-enabled", "eval");
+                d = !eval(attr.value);
+              }
+              
+              console.log("ae-enabled", d);
+              node.disabled = d;
+            }
+            
+            
+            // ae-bind
           } else if (attr.name === attrPrefix + 'bind') {
             console.log(attrPrefix + 'bind', attr.value);
             var fqPropName = attr.value;
@@ -686,6 +745,7 @@
 
             view.createListener(fqPropName, node);
 
+            // ae-model
           } else if (attr.name === attrPrefix + 'model') {
             console.log(attrPrefix + 'model', attr.value);
             node.textContent = new Function("return " + attr.value).call(view);
@@ -744,7 +804,7 @@
       };
     } else {
       return function (e) {
-        console.log('me: ', me, node, event);
+        console.log('View.prototype.createHandler function', me, node, event);
         if (event === 'click' || event === 'dblclick') {
           e.preventDefault();
           e.stopPropagation();
@@ -1171,7 +1231,7 @@
    * @memberOf æ
    * @param {String} root The root URL, currently not used,
    * @param {Boolean} useHash Whether to use hashed URLs or not, currently not used.
-   * @returns {Router}
+   * @returns {Router} A new ae-ultraslim router instance.
    */
   this.router = function (root, useHash) {
     return new Router({
