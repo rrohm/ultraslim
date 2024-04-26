@@ -119,7 +119,7 @@ THE SOFTWARE.
           },
           personReplace: function () {
             alert('Replace');
-            this.model.persons[1] = {id: 105, lastname: 'Ahnung', firstname: 'Kai', address: 'At Home'};
+            this.model.persons.replace(1, {id: 105, lastname: 'Ahnung', firstname: 'Kai', address: 'At Home'});
           },
           handle: function (id) {
             this.model.selectedId = id;

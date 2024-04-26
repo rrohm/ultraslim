@@ -49,12 +49,15 @@ module.exports = function (grunt) {
     uglify: {
       options: {
         compress: {
+          sequences: true,
+          booleans: true,
           collapse_vars: true,
           conditionals: true,
           dead_code: true,
+          drop_console: true,
           join_vars: true,
           loops: true,
-          passes: 10,
+          passes: 50,
           pure_funcs: ['console.log'],
           unused: true
         },

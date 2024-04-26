@@ -44,6 +44,12 @@
    * The template loader. 
    */
   this.templates = {};
+  
+  /**
+   * Registry Array for created services
+   */
+  this.services = [];
+  
   var attrPrefix = 'ae-';
   var expPrefix = '{{';
   var expSuffix = '}}';
@@ -116,7 +122,7 @@
   this.templates.onError = undefined;
 
   /**
-   * Default onDone handler - takes the loaded template ans passes it through. 
+   * Default onDone handler - takes the loaded template and passes it through. 
    * Provide a custem handler following this pattern, at need.
    * @param {type} template
    * @returns {String}
@@ -133,7 +139,7 @@
    * @param {Object} o The model object
    * @param {String} prop The property of the model to create a service for
    * @param {Object} config The configuration object
-   * @returns {ae-ultraslimL#32.service.service}
+   * @returns {ae-ultraslimL#166.service.service}
    */
   this.service = function (o, prop, config) {
     console.log("æ.data() ", o, prop, config);
@@ -165,6 +171,7 @@
     service.onBeforeSend = (typeof config.onBeforeSend === 'function') ? config.onBeforeSend : undefined;
     service.onSuccess = (typeof config.onSuccess === 'function') ? config.onSuccess : undefined;
     service.onDone = (typeof config.onDone === 'function') ? config.onDone : undefined;
+    æ.services.push(service);
     /**
      * Have the service issue a GET request and load data from the service URL.
      * @param {Object} config A configuration object that may contain these elements:
@@ -296,7 +303,7 @@
     function makeSetter(data, prop) {
       console.log('makeSetter', data, prop);
       return function (value) {
-        console.log('set', this, prop, value);
+        console.log('set', this, this[prop], prop, value, typeof value, Array.isArray(value));
         if (Array.isArray(prop)) {
           console.log('set', 'array prop');
         }
@@ -304,7 +311,6 @@
           console.log('set', 'array this');
         }
         if (Array.isArray(value)) {
-          me.object(value);
           console.log('set.array');
           value.push = function (e) {
             console.log("PUSH (SETTER)", value, e);
@@ -315,8 +321,45 @@
               }
             }
           };
-        } else if (typeof value === 'object') {
-          console.log('set.object');
+          value.pop = function (e) {
+            console.log("PUSH (SETTER)", value, e);
+            Array.prototype.pop.call(value);
+            if (listeners[prop]) {
+              for (var j in listeners[prop]) {
+                listeners[prop][j](o, null, value);
+              }
+            }
+          };
+          value.unshift = function (e) {
+            console.log("UNSHIFT (SETTER)", value, e);
+            Array.prototype.unshift.call(value, e);
+            if (listeners[prop]) {
+              for (var k in listeners[prop]) {
+                listeners[prop][k](o, null, value);
+              }
+            }
+          };
+          value.shift = function (e) {
+            console.log("SHIFT (SETTER)", value, e);
+            Array.prototype.shift.call(value);
+            if (listeners[prop]) {
+              for (var l in listeners[prop]) {
+                listeners[prop][l](o, null, value);
+              }
+            }
+          };
+          value.replace = function (index, e) {
+            console.log("SPLICE (SETTER)", value, index, e);
+            Array.prototype.splice.call(value, index, 1, e);
+            if (listeners[prop]) {
+              for (var l in listeners[prop]) {
+                listeners[prop][l](o, null, value);
+              }
+            }
+          };
+        } else if (typeof value === 'object' && !Array.isArray(this)) {
+          // ATTENTION! JS array are objects, too! So we need to exclude them explicitly!
+          console.log('set.object ', value);
           me.object(value);
         }
 
@@ -330,8 +373,8 @@
         
         if (Array.isArray(this)) {
           console.log('set ', 'array this', this);
-          for (var i in listeners) {
-            console.log('listeners', i, listeners[i]);
+          for (var j in listeners) {
+            console.log('listeners', j, listeners[j]);
           }
         }
       };
@@ -452,10 +495,11 @@
     // Finally: go through properties and add listener for object properties
     // in order to migrate listeners when the object property gets replaced
     // as a whole.
+    // ATTENTION! JS array are objects, too! So we need to exclude them explicitly!
     for (var prop2 in o) {
-      if (typeof o[prop2] === 'object') {
+      if (typeof o[prop2] === 'object' && !Array.isArray(o[prop2])) {
         /*jshint loopfunc: true */
-//        console.log('æ.object(): add obj-mover listeners:', prop2, o);
+        console.log('æ.object(): add obj-mover listeners:', prop2, o);
         o.addChangeListener(prop2, function (theObj, oldValue, newValue) {
           console.log("changeListener", theObj, oldValue, newValue);
           if (!oldValue) {
@@ -464,7 +508,7 @@
           if (oldValue === newValue) {
             return;
           }
-
+          
           if (oldValue.getChangeListeners) {
             if (!newValue.addChangeListener) {
               me.object(newValue);
@@ -685,14 +729,15 @@
             
             // 1.: Simple: direct binding to model property: 
             if (model[attr.value]) {
-              var data = model[attr.value];
+//              var data = model[attr.value];
+              throw "Not supported: Binding 'enabled' to model property.";
               
             } else {
               console.log("ae-enabled", node, attr.value);
-              var d;
+              var dis;
               if (typeof attr.value === "function") {
                 console.log("ae-enabled", "function");
-                d = !(attr.value)();
+                dis = !(attr.value)();
               } else if (typeof attr.value === "string") {
                 console.log("ae-enabled", "string");
                 if (attr.value.indexOf('model') === 0) {
@@ -702,15 +747,15 @@
                     node.disabled = (model[propNames[1]] === undefined);
                     console.log("ae-enabled", "model changed", node.disabled);
                   });
-                  d = (model[propNames[1]] === undefined);
+                  dis = (model[propNames[1]] === undefined);
                 }
               } else {
                 console.log("ae-enabled", "eval");
-                d = !eval(attr.value);
+                dis = !eval(attr.value);
               }
               
-              console.log("ae-enabled", d);
-              node.disabled = d;
+              console.log("ae-enabled", dis);
+              node.disabled = dis;
             }
             
             
@@ -796,7 +841,7 @@
     console.log('View.prototype.createHandler', me, node.id, event, code);
     var regex = new RegExp('[(].*[)]');
     if (code.toLowerCase().startsWith('this.controller.') && !regex.test(code)) {
-      return (e) => {
+      return function (e) {
         e.preventDefault();
         e.stopPropagation();
         var f = eval(code);

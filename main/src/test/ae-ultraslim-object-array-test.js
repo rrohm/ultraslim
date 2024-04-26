@@ -66,11 +66,19 @@ describe('ae-ultraslim-object function', function () {
     expect(listener1).toHaveBeenCalled();
   }*/);
   
-  it('fires change listener on insert.', function () {
+  it('fires change listener on inserting pritive values (numbers).', function () {
     o1.addChangeListener('list', listener1);
 
     o1.list.push(5);
     
     expect(listener1).toHaveBeenCalled();
+  });
+  
+  it('fires change listener on inserting objects.', function () {
+    o2.addChangeListener('list', listener2);
+
+    o2.list.push({name:'Jim'});
+    
+    expect(listener2).toHaveBeenCalled();
   });
 });
